@@ -97,29 +97,32 @@ final class AppState: ObservableObject {
         UserDefaults.standard.set(true, forKey: Keys.panicPrivacyActive)
         UserDefaults.standard.set(expiresAt, forKey: Keys.panicPrivacyExpiresAt)
         panicPrivacyActive = true
-        // TODO: PATCH /users/me/settings { panic_privacy_active: true }
-        // WebSocket will push hidden presence to all friends
+        Task { try? await APIClient.shared.updateSettings(["panicPrivacyActive": AnyEncodable(true)]) }
     }
 
     func deactivatePanicPrivacy() {
         UserDefaults.standard.removeObject(forKey: Keys.panicPrivacyActive)
         UserDefaults.standard.removeObject(forKey: Keys.panicPrivacyExpiresAt)
         panicPrivacyActive = false
-        // TODO: PATCH /users/me/settings { panic_privacy_active: false }
+        Task { try? await APIClient.shared.updateSettings(["panicPrivacyActive": AnyEncodable(false)]) }
     }
 
     // MARK: - Scene phase
 
     func handleBackground() {
-        // TODO: reduce LocationManager update frequency if session active
-        // TODO: flush pending SyncQueue items
+        if currentSessionId != nil {
+            LocationManager.shared.startUpdating(backgroundMode: true)
+        } else {
+            LocationManager.shared.stopUpdating()
+        }
+        SyncQueue.shared.replayAll()
     }
 
     func handleForeground() {
-        // TODO: resume LocationManager updates
-        // TODO: check if panic privacy has expired
-        // TODO: re-connect WebSocketClient if disconnected
+        LocationManager.shared.startUpdating(backgroundMode: false)
         checkPanicPrivacyExpiry()
+        Task { @MainActor in WebSocketClient.shared.connect() }
+        SyncQueue.shared.replayAll()
     }
 
     // MARK: - Private

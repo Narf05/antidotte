@@ -4,7 +4,16 @@ struct JoinStatusToggle: View {
     @Binding var status: JoinStatus
 
     var body: some View {
-        // TODO: toggle join_me / do_not_join with green/red visual feedback
-        EmptyView()
+        Menu {
+            ForEach(JoinStatus.allCases) { option in
+                Button {
+                    status = option
+                } label: {
+                    Label(option.label, systemImage: option.systemImageName)
+                }
+            }
+        } label: {
+            JoinStatusBadge(status: status)
+        }
     }
 }

@@ -20,6 +20,23 @@ final class AlcotestViewModel: ObservableObject {
     }
 
     func submitResults() {
-        // TODO: POST /score/active-test
+        Task {
+            for result in results {
+                let submission = ActiveTestSubmission(
+                    gameType: result.gameType,
+                    rawScore: result.rawScore,
+                    normalizedScore: result.normalizedScore,
+                    confidence: result.confidence,
+                    roundType: result.roundType,
+                    sessionId: nil
+                )
+                _ = try? await APIClient.shared.submitActiveTest(submission)
+            }
+            await MainActor.run {
+                results.removeAll()
+                currentRound.removeAll()
+                mode = nil
+            }
+        }
     }
 }
