@@ -9,9 +9,9 @@ Antidotte should support a live map where users can see:
 
 - Their own current location.
 - Friends who have allowed them to see location.
-- Friend drunk percentage/color state if allowed by drunk-score visibility.
+- Friend drunkness category/percentage state if allowed by drunkness visibility.
 - Session/group context when friends are out together.
-- Nearby venues and rough areas when exact sharing is not allowed.
+- Nearby venues and approximate areas when exact sharing is not allowed.
 
 Map display can use OpenStreetMap-based map data. On iOS, the frontend can use
 an OSM-compatible map renderer/provider while the backend stays provider-neutral
@@ -25,7 +25,7 @@ and stores coordinates, venues, and visibility decisions.
 - A friendship does not automatically grant live location access.
 - The backend must check visibility before sending any location update.
 - Exact live location should be treated as sensitive and short-lived.
-- Stored drink/session history should prefer venue plus rough area over exact
+- Stored drink/session history should prefer venue plus approximate area over exact
   coordinates.
 - If location is disabled, the app should degrade gracefully instead of breaking
   the map.
@@ -39,7 +39,7 @@ Global settings:
 | Setting | Type | Notes |
 |---|---|---|
 | `location_sharing_enabled` | boolean | Master switch for live location sharing. |
-| `location_precision` | enum | `exact`, `rough_area`, `venue_only`, `off`. |
+| `location_precision` | enum | `exact`, `approximate_150m`, `off`. |
 | `share_during_sessions_only` | boolean | Optional privacy limiter; default should allow sharing outside sessions if enabled. |
 | `share_when_app_closed` | boolean | Allows background location if user grants iOS permission. |
 | `show_me_on_friend_map` | boolean | Whether friends can see the user on the map at all. |
@@ -54,7 +54,7 @@ Per-friend visibility:
 | `owner_user_id` | UUID | User whose location is being protected. |
 | `viewer_user_id` | UUID, nullable | Friend who may view location. |
 | `viewer_group_id` | UUID, nullable | Group that may view location. |
-| `visibility` | enum | `exact`, `rough_area`, `venue_only`, `hidden`. |
+| `visibility` | enum | `exact`, `approximate_150m`, `hidden`. |
 | `active_only_during_session` | boolean | Restrict sharing to active sessions. |
 | `expires_at` | timestamp with timezone, nullable | Optional temporary sharing. |
 | `created_at` | timestamp with timezone | Rule creation time. |
@@ -69,7 +69,7 @@ Rule priority:
 2. Blocked/hidden per-friend rules win over group rules.
 3. Specific friend rules win over group rules.
 4. Group rules win over default friendship visibility.
-5. If no rule exists, default to hidden until the user chooses otherwise.
+5. If no specific rule exists, use the user's default friend visibility setting; the product default is visible for accepted friends when global sharing is enabled.
 
 Visibility should be configurable both per friend and by group.
 
@@ -108,7 +108,7 @@ Recommended update modes:
 | Mode | When | Frequency | Precision |
 |---|---|---:|---|
 | `active_map` | User has map open | 5-15 seconds | Exact if allowed. |
-| `active_session` | Session active, app backgrounded | 30-90 seconds | Exact/rough based on settings. |
+| `active_session` | Session active, app backgrounded | 30-90 seconds | Exact/approximate based on settings. |
 | `low_power` | Battery low or little movement | 2-5 minutes | Rough or last venue. |
 | `stationary` | User has not moved | On significant change | Last known/venue. |
 | `location_off` | Permission/settings off | None | Hidden or fallback. |
@@ -116,11 +116,11 @@ Recommended update modes:
 Rules:
 
 - Do not send high-frequency updates when the user is stationary.
-- Reduce precision before sending if the viewer is only allowed rough location.
-- Rough area should use approximately 500m precision.
+- Reduce precision before sending if the viewer is only allowed approximate location.
+- Approximate location should use approximately 150m precision.
 - Store exact realtime points only as long as needed for live presence and
   session inference.
-- Convert session/drink history into venue plus rough area for long-term
+- Convert session/drink history into venue plus approximate area for long-term
   storage.
 
 ## Location Sample Structure
@@ -140,7 +140,7 @@ Rules:
 | `speed_mps` | decimal, nullable | Optional movement speed. |
 | `heading_deg` | decimal, nullable | Optional heading. |
 | `source` | enum | `gps`, `wifi`, `cell`, `manual`, `venue_checkin`. |
-| `retention_class` | enum | `realtime`, `session_inference`, `rough_history`. |
+| `retention_class` | enum | `realtime`, `session_inference`, `approximate_history`. |
 
 `live_location_presence`
 
@@ -151,8 +151,8 @@ Rules:
 | `last_seen_at` | timestamp with timezone | Last location update. |
 | `latitude` | decimal, nullable | Exact live coordinate if retained. |
 | `longitude` | decimal, nullable | Exact live coordinate if retained. |
-| `rough_area_latitude` | decimal, nullable | Rounded/blurred coordinate. |
-| `rough_area_longitude` | decimal, nullable | Rounded/blurred coordinate. |
+| `rough_area_latitude` | decimal, nullable | Rounded/blurred approximate coordinate. |
+| `rough_area_longitude` | decimal, nullable | Rounded/blurred approximate coordinate. |
 | `venue_id` | UUID, nullable | Current/likely venue. |
 | `venue_name_snapshot` | string, nullable | Current venue name. |
 | `presence_state` | enum | `live`, `stale`, `hidden`, `location_off`. |
@@ -178,27 +178,14 @@ Exact visibility:
 }
 ```
 
-Rough area visibility:
+Approximate 150m visibility:
 
 ```json
 {
   "user_id": "friend-id",
-  "visibility": "rough_area",
+  "visibility": "approximate_150m",
   "rough_area_lat": 46.20,
   "rough_area_lon": 6.14,
-  "last_seen_at": "2026-05-02T21:15:30Z",
-  "session_id": "session-id"
-}
-```
-
-Venue-only visibility:
-
-```json
-{
-  "user_id": "friend-id",
-  "visibility": "venue_only",
-  "venue_id": "venue-id",
-  "venue_name": "Example Bar",
   "last_seen_at": "2026-05-02T21:15:30Z",
   "session_id": "session-id"
 }
@@ -228,7 +215,7 @@ Backend responsibilities:
 Frontend responsibilities:
 
 - Render map tiles/markers.
-- Show friend pins, rough areas, venues, and session groups.
+- Show friend pins, approximate areas, venues, and session groups.
 - Respect OSM tile/provider usage limits and attribution requirements.
 - Cache map tiles only according to the chosen provider's terms.
 
@@ -267,7 +254,7 @@ If GPS permission is denied but the user wants social features:
 - Friend-visible location should be generated per request/viewer, not globally
   cached as one shared truth.
 - Exact samples should expire quickly unless needed for an active session.
-- Long-term history should store venue plus rough area, not exact path history.
+- Long-term history should store venue plus approximate area, not exact path history.
 - Users must be able to disable location sharing immediately.
 - Users must be able to delete location/session history.
 
@@ -277,7 +264,7 @@ Recommended retention:
 |---|---|
 | Live presence | Latest state only. |
 | Exact realtime samples | Short window, e.g. hours to 7 days. |
-| Session inference samples | Until converted to venue/rough summary. |
+| Session inference samples | Until converted to venue/approximate summary. |
 | Rough session area | Kept with session until user deletes. |
 | Manual venue check-ins | Kept with session until user deletes. |
 

@@ -2,20 +2,20 @@
 
 Bottom sheet for setting the context of a planned or active night-out session.
 The user opens it from a button on the map page, then chooses the session
-options. This helps the app pre-fill `+1` refreshment logs, improve score
+options. This helps the app pre-fill `+1` drink logs, improve score
 estimates, organize history, and make the map/stats feel more personal.
 
-User-facing copy should say `theme`, `session`, `refreshment`, `score`, and
+User-facing copy should say `theme`, `session`, `drink`, `score`, and
 `percentage`. Internal backend fields may still use names such as
 `night_out_sessions.theme`, `drink_logs`, or `drink_unit_definition`.
 
 ## Goals
 
 - Let the user define what kind of session this is.
-- Let the user set default refreshment presets for the session.
+- Let the user set default drink presets for the session.
 - Let the user set mood/role/context.
 - Support planned future sessions and logging past sessions.
-- Feed useful context into map, stats, refreshment logging, and score estimates.
+- Feed useful context into map, stats, drink logging, and score estimates.
 - Stay optional: the app should still work if the user skips theme setup.
 
 ## Entry Points
@@ -79,18 +79,18 @@ Rules:
 - Theme should be editable during or after the session.
 - Theme feeds stats filters and history grouping.
 
-## Refreshment Defaults
+## Drink Defaults
 
 Purpose:
 
-- Pre-fill `+1` refreshment logs during the session.
+- Pre-fill `+1` drink logs during the session.
 - Improve score estimates when logs are incomplete.
 - Support average price/spend estimates.
 
 Controls:
 
-- Main refreshment preset for the session.
-- Secondary refreshment preset, optional.
+- Main drink preset for the session.
+- Secondary drink preset, optional.
 - Default serving/unit.
 - Optional strength/percentage refinement.
 - Average price per unit.
@@ -145,7 +145,7 @@ Planned session:
 - Optional venue/city.
 - Optional invited friends/group.
 - Theme.
-- Refreshment defaults.
+- Drink defaults.
 - Privacy scope.
 
 Past session:
@@ -153,7 +153,7 @@ Past session:
 - Date/time range.
 - Theme.
 - Venue(s).
-- Refreshment logs.
+- Drink logs.
 - Participants if user wants to add them privately.
 
 Rules:
@@ -187,7 +187,7 @@ Rules:
 When a session is active:
 
 - Theme appears in current session panel.
-- `+1` uses session refreshment defaults.
+- `+1` uses session drink defaults.
 - Map can show session/group context if allowed.
 - Stats can group score chart/background bands by session.
 - Session can include multiple venues.
@@ -210,9 +210,9 @@ Map:
 
 `+1` flow:
 
-- Pre-fills refreshment unit.
+- Pre-fills drink unit.
 - Pre-fills price/currency if known.
-- Offers photo-assisted refreshment detection if enabled.
+- Offers photo-assisted drink detection if enabled.
 
 Stats:
 
@@ -232,7 +232,7 @@ History:
 - If user skips theme, auto-created session still works.
 - If location is off, allow manual city/venue.
 - If price is unknown, keep spend blank until user enters or inference exists.
-- If refreshment defaults are missing, use the user's global `+1` preset.
+- If drink defaults are missing, use the user's global `+1` preset.
 
 ## Data Requirements
 
@@ -243,14 +243,14 @@ Frontend needs to read/write:
 - Planned/active/ended status.
 - Start/end time.
 - Privacy scope.
-- Refreshment defaults.
+- Drink defaults.
 - Price/currency defaults.
 - Venue/city.
 - Invited friends/groups.
 
 Potential backend additions later:
 
-- `session_refreshment_defaults`
+- `session_drink_defaults`
 - `session_mood`
 - `planned_session_reminders`
 

@@ -118,13 +118,13 @@ Required fields:
 | `price_source` | enum, nullable | `user_entered`, `venue_average`, `photo_detected`, `receipt_detected`. |
 | `venue_id` | UUID, nullable | Linked bar/club/venue if known. |
 | `venue_name_snapshot` | string, nullable | Name at time of logging. |
-| `rough_area_latitude` | decimal, nullable | Rounded/blurred area after privacy conversion. |
-| `rough_area_longitude` | decimal, nullable | Rounded/blurred area after privacy conversion. |
-| `location_accuracy_m` | decimal, nullable | Accuracy radius after rough conversion. |
+| `rough_area_latitude` | decimal, nullable | Rounded/blurred approximate area after privacy conversion. |
+| `rough_area_longitude` | decimal, nullable | Rounded/blurred approximate area after privacy conversion. |
+| `location_accuracy_m` | decimal, nullable | Accuracy radius after approximate conversion, normally around 150m. |
 | `location_source` | enum | `gps`, `venue_checkin`, `manual`, `none`. |
 | `visibility` | enum | `private`, `session`, `friends`, `group`. |
 | `note` | string, nullable | Optional short note. |
-| `photo_analysis_id` | UUID, nullable | Optional link to AI/photo-assisted detection. |
+| `photo_analysis_id` | UUID, nullable | Optional link to photo-assisted detection. |
 | `is_deleted` | boolean | Soft delete before final purge. |
 
 Recommended extra fields:
@@ -158,12 +158,12 @@ Photo-assisted detection can suggest:
 - Serving size or volume.
 - Likely alcohol percentage.
 - Venue/bar context if location is enabled.
-- Estimated price using both venue averages and visible AI/photo evidence such
+- Estimated price using both venue averages and visible photo evidence such
   as a menu, receipt, or price board.
 - Confidence score for each detected value.
 
 The user must always be able to adjust the detected values before the drink log
-is saved. AI-filled data should be marked as inferred, not treated as guaranteed
+is saved. Photo-filled data should be marked as inferred, not treated as guaranteed
 truth.
 
 `drink_photo_analysis`
@@ -210,7 +210,7 @@ Drink log privacy rules:
 - "With who" can be stored as private metadata visible only to the logger.
 - Exact per-drink coordinates should not be stored long term.
 - If location is enabled, the backend should convert drink location into a
-  venue plus rough area before storing it in the drink log.
+  venue plus approximate area before storing it in the drink log.
 - Drink price can be user-entered or inferred from venue/photo data. Inferred
   prices should keep a source and confidence so the user can correct them.
 

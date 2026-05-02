@@ -1,11 +1,11 @@
 # Frontend - Settings
 
 User-facing configuration screen for profile, privacy, score calibration,
-refreshment logging, location, friends, notifications, and account controls.
+drink logging, location, friends, notifications, and account controls.
 
-User-facing copy should say `score`, `percentage`, and `refreshment`. Internal
-backend fields may still use existing names such as `drink_unit_definition`,
-`drunk_score_sharing_enabled`, or `photo_drink_detection_enabled`.
+User-facing copy should say `score`, `percentage`, and `drink`. Internal
+backend fields may still use existing names such as `drink_unit_definition`
+or `photo_drink_detection_enabled`.
 
 ## Goals
 
@@ -22,16 +22,17 @@ Recommended settings sections:
 
 0. Panic Privacy
 1. Account
-2. Privacy & Safety
-3. Location
-4. Score & Calibration
-5. `+1` Refreshment Unit
-6. Photo-Assisted Refreshment Logging
-7. Friends & Groups
-8. Notifications
-9. Language
-10. Data, Export & Deletion
-11. About
+2. Appearance
+3. Privacy & Safety
+4. Location
+5. Score & Calibration
+6. `+1` Drink Unit
+7. Photo-Assisted Drink Logging
+8. Friends & Groups
+9. Notifications
+10. Language
+11. Data, Export & Deletion
+12. About
 
 Settings should be searchable if the page becomes long.
 Use one long settings screen with section anchors rather than separate settings
@@ -58,6 +59,25 @@ Rules:
   username/search.
 - Private calibration data must not appear on the public profile.
 
+## Appearance
+
+Controls:
+
+- Style mode: `Blackout`, `Cartoon`, `Chaos`.
+- Main animations: on/off.
+
+Defaults:
+
+- Style mode: `Chaos`.
+- Main animations: on, unless device reduced-motion settings require less motion.
+
+Rules:
+
+- Style mode is private to the user and only changes how their app looks.
+- Main animations can be turned off independently from style mode.
+- Turning animations off removes major wobble, shake, jumping labels, page motion, and animated backgrounds.
+- Reduced-motion system settings override the in-app animation setting.
+
 ## Privacy & Safety
 
 Top-level controls:
@@ -66,7 +86,7 @@ Top-level controls:
 |---|---|---|
 | Panic privacy | Off | Hides location and score immediately for 24 hours. |
 | Location sharing | Asked onboarding | Master switch. |
-| Score sharing | Asked onboarding | Lets allowed friends see exact percentage. |
+| Drunkness visibility | Asked onboarding | Controls whether friends see category, percentage, both, or nothing. |
 | Motion tracking | Off | Derived motion summaries only. |
 | Phone usage tracking | Off | Derived phone-use summaries only. |
 | Voice analysis | Off | Optional active mini-test voice check. |
@@ -74,10 +94,10 @@ Top-level controls:
 
 Social visibility shortcut:
 
-- Provide a combined social visibility control for location sharing and score
-  sharing.
+- Provide a combined social visibility control for location sharing and
+  drunkness visibility.
 - This should make it easy to turn both social signals on/off together.
-- Advanced users can still edit location and score sharing separately.
+- Advanced users can still edit location and drunkness visibility separately.
 
 Panic privacy:
 
@@ -96,7 +116,7 @@ Fallbacks:
 - If phone usage tracking is off, score uses motion, logs, sessions, and active
   mini-tests.
 - If voice analysis is off, voice mini-test is hidden or disabled.
-- If score sharing is off, friends cannot see percentage.
+- If drunkness visibility is hidden, friends cannot see category or percentage.
 
 ## Location
 
@@ -105,7 +125,7 @@ Controls:
 | Control | Options | Notes |
 |---|---|---|
 | Location sharing | on/off | Global location visibility. |
-| Location precision | exact, rough area, venue only, hidden | Rough area means about 500m. |
+| Location precision | exact, approximate 150m, off | Approximate means friends see a position blurred to about 150m. |
 | Background location | on/off | Requires iOS permission. |
 | Show me on friend map | on/off | Controls map presence. |
 | Share during sessions only | on/off | Optional privacy limiter. |
@@ -113,8 +133,7 @@ Controls:
 Per-friend/per-group location:
 
 - Exact.
-- Rough area.
-- Venue only.
+- Approximate 150m.
 - Hidden.
 - Temporary sharing, e.g. exact for 2 hours.
 
@@ -130,7 +149,7 @@ Rules:
 
 Fallbacks:
 
-- If location is off, user can still create sessions and log refreshments.
+- If location is off, user can still create sessions and log drinks.
 - User can set manual city/area and usual venues.
 - Venue can be selected manually.
 
@@ -139,19 +158,19 @@ Fallbacks:
 Controls:
 
 - Body weight.
-- Usual refreshments per session.
+- Usual drinks per session.
 - Usual sessions per week.
 - Free-form sports description.
 - Height, optional.
 - Tolerance self-rating, optional.
-- Score sharing on/off.
+- Drunkness visibility: category only, percentage only, category and percentage, or hidden.
 - Active mini-test suggestions on/off, if we decide to expose this.
 
 Rules:
 
 - Body weight is required from onboarding but editable here.
 - Calibration data is private and not shown to friends.
-- Score percentage can be shared with allowed friends if enabled.
+- Drunkness can be shared with allowed friends as category only, percentage only, category and percentage, or hidden.
 - Confidence is internal and not shown to friends.
 - The score must not be presented as a medical or legal test.
 
@@ -160,11 +179,11 @@ Fallbacks:
 - If optional calibration is blank, use default model assumptions with lower
   internal confidence.
 
-## `+1` Refreshment Unit
+## `+1` Drink Unit
 
 Controls:
 
-- Default refreshment preset.
+- Default drink preset.
 - Custom unit label.
 - Volume/size.
 - Strength/percentage, if user wants to refine it.
@@ -172,13 +191,13 @@ Controls:
 
 Rules:
 
-- Use user-facing language around refreshment units.
+- Use user-facing language around drink units.
 - Let users refine details after onboarding.
 - Changes affect future logs and estimates.
 - Historical logs should keep the values saved at the time unless user chooses
   to edit them.
 
-## Photo-Assisted Refreshment Logging
+## Photo-Assisted Drink Logging
 
 Controls:
 
@@ -190,14 +209,14 @@ Controls:
 
 Rules:
 
-- User can always edit AI-filled values before saving.
+- User can always edit photo-filled values before saving.
 - Photos are never shared with friends by default.
 - If saving is turned off, future raw photos are deleted after analysis.
-- If turning saving off, offer cleanup for previously saved refreshment photos.
+- If turning saving off, offer cleanup for previously saved drink photos.
 
 Fallbacks:
 
-- If photo detection is off, `+1` remains a fast manual refreshment log.
+- If photo detection is off, `+1` remains a fast manual drink log.
 
 ## Friends & Groups
 
@@ -221,7 +240,7 @@ Rules:
 - Raw address book data should not be stored permanently.
 - New accepted friends default to visible for all friend-level social features.
 - Visible for all includes exact location if global location sharing is enabled.
-- Visible for all includes percentage if score sharing is enabled.
+- Visible for all follows the user's drunkness visibility setting.
 - Per-friend settings can override defaults.
 - Users can apply a visibility preset to all friends at once.
 - Groups cannot override global privacy switches.
@@ -229,10 +248,10 @@ Rules:
 
 Per-friend settings:
 
-- Location visibility: exact, rough area, venue only, hidden.
-- Score visibility: on/off.
+- Location visibility: exact, approximate 150m, hidden.
+- Drunkness visibility: category only, percentage only, category and percentage, hidden.
 - Nearby notification: on/off.
-- Starts-refreshing notification: off by default.
+- Starts-drinking notification: off by default.
 - Session notification: on/off.
 - Remove friend.
 - Block user.
@@ -240,10 +259,9 @@ Per-friend settings:
 Bulk visibility presets:
 
 - Visible for all.
-- Exact location + score.
-- Rough area + score.
-- Venue only + score.
-- Hide location, show score.
+- Exact location + selected drunkness visibility.
+- Approximate 150m + selected drunkness visibility.
+- Hide location, show selected drunkness visibility.
 - Hide from all.
 
 ## Notifications
@@ -256,16 +274,16 @@ Global controls:
 - Group invites.
 - Session invites.
 - Nearby friends.
-- Friend starts refreshing.
+- Friend starts drinking.
 - Privacy events.
 
 Rules:
 
 - General notifications are on only if the user grants iOS permission.
-- Per-friend "starts refreshing" notifications exist but are off by default.
+- Per-friend "starts drinking" notifications exist but are off by default.
 - Notification text should not reveal exact location.
-- Notification text should not reveal percentage unless the recipient can see it
-  in-app.
+- Notification text should not reveal drunkness category or percentage unless
+  the recipient can see it in-app.
 - If iOS notification permission is denied, show an action to open system
   settings.
 
@@ -290,7 +308,7 @@ Rules:
 Controls:
 
 - Export my data.
-- Delete saved refreshment photos.
+- Delete saved drink photos.
 - Delete a session from history.
 - Delete account.
 - Recover account during deletion grace period.
@@ -343,7 +361,7 @@ Examples:
 
 ## User-Facing Copy Rules
 
-- Say `refreshment`, not backend/internal terms.
+- Say `drink`, not backend/internal terms.
 - Say `score` or `percentage`, not medical/legal claims.
 - Do not present the app as a medical tool.
 - Do not present score as proof of safety.
@@ -353,6 +371,6 @@ Examples:
 
 - Settings should be one long screen with section anchors.
 - Panic privacy should be fixed at the top of settings.
-- Score sharing and location sharing should have a combined social visibility
+- Drunkness visibility and location sharing should have a combined social visibility
   shortcut.
 - Users can apply visibility presets to all friends at once.

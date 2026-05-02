@@ -17,7 +17,7 @@ GDPR/region-specific flows should be reviewed properly.
 - Enforce visibility on the backend before any friend receives data.
 - Prefer derived summaries over raw sensitive data.
 - Store exact location only briefly; long-term history should use venue plus
-  rough area.
+  approximate area.
 - Do not persist raw audio, raw messages, or raw sensor streams.
 - Make deletion, export, and account removal real product flows, not support
   tickets only.
@@ -30,7 +30,7 @@ GDPR/region-specific flows should be reviewed properly.
 | Setting | Type | Default | Notes |
 |---|---|---|---|
 | `location_sharing_enabled` | boolean | Ask onboarding | Master live location switch. |
-| `location_precision` | enum | `hidden` | `exact`, `rough_area`, `venue_only`, `hidden`. |
+| `location_precision` | enum | `off` | `exact`, `approximate_150m`, `off`. |
 | `share_when_app_closed` | boolean | Off | Background location with iOS permission. |
 | `photo_drink_detection_enabled` | boolean | Off | Enables photo-assisted drink detection. |
 | `save_drink_photos_enabled` | boolean | Off | If off, delete raw photos after analysis. |
@@ -38,7 +38,7 @@ GDPR/region-specific flows should be reviewed properly.
 | `phone_usage_tracking_enabled` | boolean | Off | Enables derived phone-use summaries. |
 | `voice_analysis_enabled` | boolean | Off | Enables optional active-test voice check. |
 | `message_analysis_enabled` | boolean | Off | Future feature; derived metrics only. |
-| `drunk_score_sharing_enabled` | boolean | Ask onboarding | Allows friends to see drunk percentage if visible. |
+| `drunkness_visibility` | enum | Ask onboarding | `category`, `percentage`, `category_percentage`, `hidden`. |
 | `analytics_enabled` | boolean | Off | Product analytics if added later. |
 | `notifications_enabled` | boolean | On | Non-sensitive app notifications. |
 
@@ -64,7 +64,7 @@ Consent records:
 |---|---|---|
 | `id` | UUID | Consent record. |
 | `user_id` | UUID | User who made the choice. |
-| `consent_type` | enum | `location`, `background_location`, `motion`, `phone_usage`, `photo_analysis`, `photo_storage`, `voice_analysis`, `drunk_score_sharing`. |
+| `consent_type` | enum | `location`, `background_location`, `motion`, `phone_usage`, `photo_analysis`, `photo_storage`, `voice_analysis`, `drunkness_visibility`. |
 | `status` | enum | `granted`, `denied`, `revoked`. |
 | `source` | enum | `onboarding`, `settings`, `system_permission`, `migration`. |
 | `created_at` | timestamp with timezone | When this record was created. |
@@ -85,8 +85,7 @@ Visibility levels:
 | Level | Meaning |
 |---|---|
 | `exact` | Precise live coordinates if enabled. |
-| `rough_area` | Approximate 500m area. |
-| `venue_only` | Current/likely venue only. |
+| `approximate_150m` | Approximate 150m area. |
 | `hidden` | Viewer receives no location. |
 
 ## Data Collected By Feature
@@ -114,7 +113,7 @@ Collected:
 - Drink time to seconds.
 - Drink type/unit/ABV/volume when known.
 - Price if entered or inferred.
-- Venue plus rough area if location is enabled.
+- Venue plus approximate area if location is enabled.
 - Private "with who" metadata.
 - Optional photo-analysis result.
 
@@ -131,7 +130,7 @@ Collected only when enabled:
 
 - Live location presence.
 - Short-lived exact samples.
-- Rough area around 500m.
+- Approximate area around 150m.
 - Venue/check-in context.
 - Stale timestamp and hide-after timestamp.
 
@@ -141,7 +140,7 @@ Privacy:
 - Background location requires explicit iOS permission and app setting.
 - Stale locations show with timestamp, then hide after 12 hours.
 - If location sharing is turned off, hide immediately.
-- Long-term history stores venue plus rough area, not exact paths.
+- Long-term history stores venue plus approximate area, not exact paths.
 
 ### Drunk Score
 
@@ -156,7 +155,7 @@ Collected/derived:
 
 Privacy:
 
-- Friends may see exact drunk percentage if sharing is enabled.
+- Friends see only the drunkness visibility the user allows: category, percentage, both, or hidden.
 - Friends do not see confidence.
 - Confidence is internal and used to decide whether to suggest a mini-test.
 - The score is not a medical BAC reading and must not be presented as proof of
@@ -338,7 +337,7 @@ Backend must check privacy at:
 
 - Location update ingestion.
 - Friend map payload generation.
-- Drunk-score sharing.
+- Drunkness visibility.
 - Session participant visibility.
 - Drink log sharing.
 - Photo storage/deletion.

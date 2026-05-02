@@ -379,10 +379,10 @@ Backend:
 ## Display Rules
 
 - The user should see their exact drunk percentage.
-- Friends who are allowed to see the score should also see the exact
-  percentage.
-- Friend-visible percentages should be color coded so risk level is easy to
-  scan on the map.
+- Friends see only what the user's drunkness visibility allows: category only,
+  percentage only, category and percentage, or hidden.
+- Friend-visible categories should use the shared tipsiness names: `Fresh`,
+  `Buzzing`, `Loose`, `Wavy`, `Gone Mode`, and `Unknown`.
 - Confidence should not be shown as a number to friends.
 - Confidence is used internally to decide whether the app should suggest an
   active mini-test.

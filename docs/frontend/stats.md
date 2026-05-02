@@ -1,9 +1,9 @@
 # Frontend - Stats
 
-Personal and social statistics screen for score history, refreshment logs,
+Personal and social statistics screen for score history, drink logs,
 session history, friend rankings, and long-term patterns.
 
-User-facing copy should say `score`, `percentage`, and `refreshment`. Internal
+User-facing copy should say `score`, `percentage`, and `drink`. Internal
 backend fields may still use names such as `drunk_score_snapshots`,
 `drink_logs`, or `night_out_sessions`.
 
@@ -44,7 +44,7 @@ Chart requirements:
 - Show tooltip/crosshair with timestamp, percentage, session name, and venue if
   available.
 - Show active session regions as background bands.
-- Show `+1` refreshment events as small markers.
+- Show `+1` drink events as small markers.
 - Show active mini-test events as separate markers.
 - Show 12-hour responsibility-window tail after a session ends.
 - Do not show internal confidence number.
@@ -65,14 +65,14 @@ Data sources:
 
 - `drunk_score_snapshots` for score points.
 - `night_out_sessions` for session bands.
-- `drink_logs` for refreshment markers.
+- `drink_logs` for drink markers.
 - `active_test_results` for mini-test markers.
 - `session_venues` for venue annotations.
 
 Rules:
 
 - Missing data should create gaps or low-detail regions, not fake precision.
-- If score sharing is off, this does not affect the user's own stats.
+- Drunkness visibility does not affect the user's own stats.
 - Deleted sessions and logs must disappear from charts after sync.
 - The chart should not imply the score is a medical result.
 
@@ -82,7 +82,7 @@ Interactions:
 
 - Scrub horizontally to inspect time.
 - Tap a session band to open session detail.
-- Tap a refreshment marker to open the log detail.
+- Tap a drink marker to open the log detail.
 - Tap a mini-test marker to open test summary.
 - Pinch/zoom where native iOS interaction makes sense.
 - Quick range selector similar to stock apps.
@@ -92,8 +92,8 @@ Tooltip content:
 - Date/time.
 - Score percentage.
 - Session title if present.
-- Venue or rough area if available.
-- Number of refreshments logged nearby in time.
+- Venue or approximate area if available.
+- Number of drinks logged nearby in time.
 
 Do not show:
 
@@ -110,7 +110,7 @@ Possible metrics:
 - Average score.
 - Peak score.
 - Number of sessions.
-- Total logged refreshment units.
+- Total logged drink units.
 - Average session length.
 - Total spend if known.
 - Venues visited.
@@ -136,7 +136,7 @@ Ranking options:
 - Longest session.
 - Most venues visited.
 - Most active mini-tests completed.
-- Most logged refreshment units.
+- Most logged drink units.
 
 Default ranking metric:
 
@@ -152,7 +152,7 @@ Privacy rules:
 - Do not reveal hidden sessions.
 - Do not reveal exact private location.
 - Do not show internal confidence.
-- If a friend disables score sharing, exclude their score-based ranking or show
+- If a friend hides drunkness visibility, exclude their score-based ranking or show
   them as hidden.
 - Panic privacy should remove a user from realtime/social ranking until it
   expires or is disabled.
@@ -163,7 +163,7 @@ Ranking display:
 - Friend display name/photo.
 - Metric value.
 - Time range.
-- Optional color-coded percentage if score is visible.
+- Optional category/percentage if score visibility allows it.
 
 Avoid shaming language. The ranking should feel playful/social, not punitive.
 
@@ -178,17 +178,17 @@ Each history item should show:
 - Duration.
 - Peak percentage.
 - Average percentage if available.
-- Logged refreshment count/units.
+- Logged drink count/units.
 - Total spend if known.
 - Venues visited count.
 - Friends/participants if visible.
-- City/rough area.
+- City/approximate area.
 
 Actions:
 
 - Open session detail.
 - Edit title/theme.
-- Edit or delete refreshment logs.
+- Edit or delete drink logs.
 - Delete session.
 - Link to settings for data export if needed.
 
@@ -196,7 +196,7 @@ Rules:
 
 - One session can include multiple venues.
 - Auto-created sessions should be editable.
-- House parties/private addresses show private/rough labels only.
+- House parties/private addresses show private/approximate labels only.
 - Deleted sessions disappear from stats after sync.
 - History export should be available only from settings, not directly from
   session detail.
@@ -208,7 +208,7 @@ Session detail should combine timeline, summary, participants, and venues.
 Sections:
 
 - Session score chart.
-- Timeline of refreshment logs and mini-tests.
+- Timeline of drink logs and mini-tests.
 - Venue list.
 - Participants.
 - Spend summary.
@@ -217,8 +217,8 @@ Sections:
 Timeline events:
 
 - Session start/end.
-- `+1` refreshment logs.
-- Photo-assisted refreshment logs.
+- `+1` drink logs.
+- Photo-assisted drink logs.
 - Venue arrival/departure.
 - Active mini-test.
 - Score peak.
@@ -235,7 +235,7 @@ Filters:
 - City/area.
 - Session theme.
 - Score range.
-- Refreshment type/preset.
+- Drink type/preset.
 - Price/spend.
 
 Rules:
@@ -253,7 +253,7 @@ Signals disabled:
 
 - If motion/phone signals are off, show stats based on sessions and logs only.
 - If location is off, omit venue/map-based stats or use manually selected venues.
-- If score sharing is off, friend ranking still can show non-score stats if
+- If drunkness visibility is hidden, friend ranking still can show non-score stats if
   allowed.
 
 Low data:
@@ -282,14 +282,14 @@ Frontend needs endpoints/views for:
 - Session summaries by range.
 - Session detail.
 - Friend ranking by metric/range.
-- Refreshment log summaries.
+- Drink log summaries.
 - Venue/session aggregation.
 - Spend aggregation.
 
 Spend requirements:
 
 - Stats should include money spent in v1.
-- Use known or inferred prices from refreshment logs and venue averages.
+- Use known or inferred prices from drink logs and venue averages.
 - If price data is incomplete, show partial totals clearly.
 - Always show currency.
 

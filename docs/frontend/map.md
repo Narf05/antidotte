@@ -326,7 +326,7 @@ Profile preview should show:
 - Show only accepted friends.
 - Respect location sharing.
 - Respect event/theme sharing.
-- Respect drunk score sharing.
+- Respect drunkness visibility.
 - Respect notification settings.
 - Do not show precise location when location is off.
 - Do not expose private signals behind the drunk score.
@@ -345,5 +345,4 @@ If friends are out but hidden by privacy:
 ## Open Questions
 
 - Should `Do not join me` hide the user from swipe invite entirely?
-- Should friends be able to see exact drunk score percentages, or only labels?
 - Should event/theme sharing be automatic or separately toggleable?

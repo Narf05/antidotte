@@ -13,10 +13,11 @@ users skip optional tracking features.
 - Verify the user is old enough to use the app.
 - Create the basic profile.
 - Collect required score calibration.
-- Define the user's `+1` refreshment unit.
+- Define the user's `+1` drink unit.
 - Ask for location sharing and iOS location permission.
-- Ask whether friends can see the user's percentage.
+- Ask what drunkness info friends can see.
 - Configure default friend visibility.
+- Confirm default style mode and main animation setting.
 - Offer friend discovery.
 - Set notification preferences.
 - Explain privacy controls without overwhelming the first launch.
@@ -29,15 +30,16 @@ Recommended screen order:
 2. Age gate.
 3. Account basics.
 4. Score calibration.
-5. `+1` refreshment unit setup.
+5. `+1` drink unit setup.
 6. Privacy overview.
 7. Location sharing.
-8. Score sharing.
-9. Optional passive signals.
-10. Photo-assisted refreshment logging.
-11. Friends and visibility defaults.
-12. Notifications.
-13. Ready screen / enter map.
+8. Drunkness visibility.
+9. Appearance.
+10. Optional passive signals.
+11. Photo-assisted drink logging.
+12. Friends and visibility defaults.
+13. Notifications.
+14. Ready screen / enter map.
 
 The flow should save progress so users can resume if they leave during
 onboarding.
@@ -46,7 +48,7 @@ onboarding.
 
 Purpose:
 
-- Explain that Antidotte is a social night-out map and refreshment-awareness
+- Explain that Antidotte is a social night-out map and drink-awareness
   app.
 - Make clear that the score is an estimate, not a medical or legal test.
 - Set expectation that privacy controls are adjustable later.
@@ -103,11 +105,11 @@ Required:
 
 - `body_weight_kg`.
 - `drink_unit_definition` as the backend field for the user's `+1`
-  refreshment unit.
+  drink unit.
 
 Optional:
 
-- `usual_refreshments_per_session`.
+- `usual_drinks_per_session`.
 - `usual_sessions_per_week`.
 - `sports` as free-form text.
 - `height_cm`.
@@ -122,7 +124,7 @@ Rules:
 - Explain that calibration improves estimates but does not produce a medical
   result.
 
-## 5. `+1` Refreshment Unit Setup
+## 5. `+1` Drink Unit Setup
 
 Purpose:
 
@@ -130,13 +132,13 @@ Define what one `+1` means for this user.
 
 Required:
 
-- Default refreshment type or custom refreshment unit.
-- Unit label, e.g. small refreshment, glass, bottle, shot, custom.
+- Default drink type or custom drink unit.
+- Unit label, e.g. small drink, glass, bottle, shot, custom.
 - Preset strength/size where possible; user can refine exact details later.
 
 Examples:
 
-- `Small refreshment = 1`
+- `Small drink = 1`
 - `Glass = 1`
 - `Shot = 0.5`
 - `Custom = user-defined`
@@ -145,7 +147,7 @@ Rules:
 
 - User can edit this later in settings.
 - Use presets during onboarding and let the user refine volume/percentage later.
-- This affects refreshment logs, stats, and score estimates.
+- This affects drink logs, stats, and score estimates.
 
 ## 6. Privacy Overview
 
@@ -189,7 +191,7 @@ If skipped:
 
 - Set `location_sharing_enabled = false`.
 - Allow manual city/area and usual bars/venues.
-- User can still log refreshments and create sessions.
+- User can still log drinks and create sessions.
 
 Settings created:
 
@@ -198,32 +200,62 @@ Settings created:
 - `share_when_app_closed`
 - `show_me_on_friend_map`
 
-## 8. Score Sharing
+## 8. Drunkness Visibility
 
-Ask whether friends can see the user's percentage.
+Ask what drunkness information friends can see.
 
 Choices:
 
-- Share with accepted friends.
-- Keep private for now.
+- Show category only.
+- Show percentage only.
+- Show category and percentage.
+- Show nothing.
 
 Rules:
 
-- Friends can see exact percentage if enabled.
-- Percentage is color coded in the app.
+- Default should be category only.
+- Category includes the tipsiness name and emoji.
+- Percentage is only visible if the user chooses percentage or category and percentage.
 - Confidence is not shown to friends.
 - User can change sharing per friend/group later.
 - Panic privacy hides the score immediately.
 
 Settings created:
 
-- `drunk_score_sharing_enabled`
+- `drunkness_visibility`
 
-Note: user-facing copy should say `score`, `percentage`, and `refreshment`.
+Note: user-facing copy should say `score`, `percentage`, and `drink`.
 Internal backend fields may still use existing names such as
-`drink_unit_definition` or `drunk_score_sharing_enabled`.
+`drink_unit_definition`.
 
-## 9. Optional Passive Signals
+## 9. Appearance
+
+Confirm the user's visual mode and animation preference.
+
+Defaults:
+
+- Style mode: `Chaos`.
+- Main animations: on.
+
+Choices:
+
+- Keep `Chaos`.
+- Switch to `Cartoon`.
+- Switch to `Blackout`.
+- Turn main animations off.
+
+Rules:
+
+- Style mode is private to the user.
+- The user can change this later in Settings.
+- Reduced motion settings override app animation settings.
+
+Settings created:
+
+- `style_mode`
+- `main_animations_enabled`
+
+## 10. Optional Passive Signals
 
 Ask separately for each optional signal.
 
@@ -258,18 +290,18 @@ Settings created:
 - `voice_analysis_enabled`
 - `message_analysis_enabled`
 
-## 10. Photo-Assisted Refreshment Logging
+## 11. Photo-Assisted Drink Logging
 
-Ask whether the user wants photo-assisted refreshment detection.
+Ask whether the user wants photo-assisted drink detection.
 
 Choices:
 
-- Enable photo refreshment detection.
+- Enable photo drink detection.
 - Skip for now.
 
 Then ask separately:
 
-- Save refreshment photos after analysis.
+- Save drink photos after analysis.
 - Delete raw photos after analysis.
 
 Defaults:
@@ -280,7 +312,7 @@ Defaults:
 
 Rules:
 
-- User can always edit AI-filled refreshment data before saving.
+- User can always edit photo-filled drink data before saving.
 - Photos are never shared with friends by default.
 - User can change photo settings later.
 
@@ -290,7 +322,7 @@ Settings created:
 - `save_drink_photos_enabled`
 - `photo_analysis_default`
 
-## 11. Friends and Visibility Defaults
+## 12. Friends and Visibility Defaults
 
 Offer friend discovery methods:
 
@@ -313,7 +345,7 @@ Default visibility for new friends:
 
 - Visible for all friend-level social features.
 - Includes exact location if global location sharing is enabled.
-- Includes percentage if score sharing is enabled.
+- Uses the user's drunkness visibility choice for score display.
 - Per-friend settings can override this later.
 
 Friend groups:
@@ -322,14 +354,14 @@ Friend groups:
 - Optionally offer "Create first group" after adding friends.
 - Groups can be personal lists or shared groups.
 
-## 12. Notifications
+## 13. Notifications
 
 Ask for notification permission after explaining social alerts.
 
 Default:
 
 - General notifications on if the user grants iOS permission.
-- Per-friend "starts refreshing" notifications off by default.
+- Per-friend "starts drinking" notifications off by default.
 - Nearby-friend notifications can exist, but must respect location permissions.
 
 Notification types:
@@ -339,12 +371,12 @@ Notification types:
 - Group invites.
 - Session invites.
 - Nearby friend, if both users allow it.
-- Friend starts refreshing, only if enabled for that friend.
+- Friend starts drinking, only if enabled for that friend.
 
 Rules:
 
 - Do not reveal exact location in notification text.
-- Do not reveal percentage in notification text unless allowed.
+- Do not reveal drunkness category or percentage in notification text unless allowed.
 - User can change notification preferences later.
 
 Settings created:
@@ -352,7 +384,7 @@ Settings created:
 - `notifications_enabled`
 - Initial `friend_notification_settings`
 
-## 13. Ready / Enter Map
+## 14. Ready / Enter Map
 
 Final screen should:
 
@@ -393,19 +425,19 @@ Required:
 - Age gate: 16+.
 - Account basics.
 - Body weight.
-- `+1` refreshment unit definition.
+- `+1` drink unit definition.
 - Core privacy acknowledgement.
 
 Asked but optional:
 
 - Location sharing.
 - Background location.
-- Score sharing.
+- Drunkness visibility.
 - Motion tracking.
 - Phone usage tracking.
 - Voice analysis.
-- Photo refreshment detection.
-- Saved refreshment photos.
+- Photo drink detection.
+- Saved drink photos.
 - Contacts matching.
 - Notifications.
 - Free-form sports.

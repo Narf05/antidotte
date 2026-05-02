@@ -174,7 +174,7 @@ Group rules:
 - Group creation is available to users.
 - Groups can be personal lists only the owner sees.
 - Groups can also be shared groups where members see the group and each other.
-- Groups can be used in privacy rules, for example "share rough location with
+- Groups can be used in privacy rules, for example "share approximate location with
   Close Friends".
 - Group visibility rules must still respect each user's own privacy settings.
 - Leaving/removing a member should revoke future group-based access.
@@ -188,7 +188,7 @@ viewer can see.
 Visibility surfaces:
 
 - Live location.
-- Drunk percentage.
+- Drunkness category/percentage visibility.
 - Active session presence.
 - Session invite/join status.
 - Drink activity notifications.
@@ -200,9 +200,9 @@ Rules:
   friend-level social features, unless the user changes the default.
 - By default, visible for all includes exact location for accepted friends.
 - Exact location still requires the user's global location sharing to be enabled.
-- Drunk score sharing requires `drunk_score_sharing_enabled`.
+- Drunk score visibility follows the user's drunkness visibility setting.
 - Per-friend hidden rules override group allow rules.
-- Group allow rules can grant rough/venue/drunk-score visibility to a group.
+- Group allow rules can grant exact/approximate location and drunk-score visibility to a group.
 - Panic privacy overrides all friend/group visibility immediately.
 - Account deletion/removal removes social visibility immediately.
 
@@ -256,7 +256,7 @@ Rules:
 
 - Notifications respect privacy settings.
 - Do not reveal exact location in notification text.
-- Do not reveal drunk percentage in notification text unless the recipient is
+- Do not reveal drunkness category or percentage in notification text unless the recipient is
   allowed to see it in-app.
 - Users can disable notifications.
 - Per-friend "friend starts drinking" notifications should exist but be off by

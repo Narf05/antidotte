@@ -519,7 +519,7 @@ HOW ARE YOU FEELING?
 
 Options:
 - `Chill`
-- `Warm`
+- `Buzzing`
 - `Loud`
 - `Wobbly`
 - `Chaos mode`
@@ -724,11 +724,11 @@ Group round saved.
 The result screen shows what changed after the round.
 
 Possible score labels:
-- `Sober`
-- `Warm`
-- `Tipsy`
-- `Drunk`
-- `Very drunk`
+- `Fresh`
+- `Buzzing`
+- `Loose`
+- `Wavy`
+- `Gone Mode`
 - `Unknown`
 - `Needs more signals`
 
@@ -754,8 +754,8 @@ Multiplayer example:
 ```text
 ROUND RESULTS
 
-MIA - Warm - confidence medium
-LEO - Tipsy - confidence high
+MIA - Buzzing - confidence medium
+LEO - Loose - confidence high
 NOA - Unknown - needs more signals
 ```
 

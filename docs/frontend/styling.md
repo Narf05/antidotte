@@ -197,7 +197,7 @@ Visual direction:
 - The screen should feel like a notebook after a messy night out.
 
 Important:
-- Chaos must be an optional user-selected mode.
+- Chaos is the default mode, but users can switch away from it at any time.
 - Chaos must respect accessibility settings.
 - Core actions must remain tappable and readable.
 - Privacy controls must not become confusing.
@@ -483,7 +483,3 @@ Before accepting a screen, check:
 - Is Chaos unreadable? Pull it back.
 - Is Blackout too playful? Calm it down.
 - Is Cartoon too polished? Make it more handmade.
-
-## Open Questions
-
-- Should `Chaos` unlock only after setup, or be available immediately?

@@ -12,15 +12,19 @@ Antidotte is a social iOS app for tracking nights out with friends. Two core pil
 ## Screens (Frontend)
 
 ### 1. Map (BEST)
-The main screen. Shows a live map with friends' locations and their current drunk level.
+The main screen. Shows a live map with friends' locations, join status, current tipsiness category, and active event/theme.
 
 - Pins per friend with a visual drunk indicator
+- Five tipsiness categories: `Fresh`, `Buzzing`, `Loose`, `Wavy`, `Gone Mode`
+- Green `join me` by default, red `do not join me` when turned off
+- Top-right location precision control: exact, approximate 150m, or off
+- Location sharing groups so users can decide who sees exact/approximate/off
 - `+1` button (bottom-left corner) to log a drink
 - Party theme selector — set the evening type (beer night, cocktail night, etc.) and the average drink price
 - See who is already drinking and who hasn't started
 - Tinder-style swipe to invite someone to drink with you
 - Group view — see who is in the same group/location
-- If a friend has location off: shows their street + a nearby bar suggestion
+- If a friend has location off: show only allowed fallback context, such as approximate area, event/theme, or manually provided usual bars
 
 ### 2. Stats (SEST)
 Personal and social drinking stats.
@@ -33,10 +37,18 @@ Personal and social drinking stats.
 Personal space, mostly standalone actions.
 
 - Run a solo alcotest
+- Control drunkness visibility: category only, percentage only, both, or hidden
+- Review join status, location precision, events, groups, and privacy summary
 - App info and account settings
 
 ### 4. Alcotest (TEST)
-Active drunkenness test panel. See *Drunkenness Tracking* below for the detection methods.
+Gamified active test panel that adds extra signals to the drunk score.
+
+- First choice: Single Player or Multiplayer
+- Multiplayer supports pass-the-phone and connected-device rounds
+- Temporary guests are allowed and stay in local night history
+- Games include reaction, coordination, memory, motion, voice, tongue twister, and vibe checks
+- Score updates only after the full round is complete
 
 ### 5. Evening Theme (THÈME / SOIRÉE)
 Set context for the current night before going out.
@@ -63,7 +75,7 @@ The app estimates intoxication passively and actively using several signals, alw
 | Signal | How it's used |
 |---|---|
 | `+1` button | Manual drink log — user taps each time they finish a drink |
-| Voice call analysis | AI listens to how the person speaks (slurring, pace) → outputs % estimate |
+| Voice analysis | Optional active tests analyze speech clarity, slurring, pace, and tongue twisters |
 | Message analysis | Typing patterns and language in messages |
 | Internet search behavior | Query patterns as a proxy for cognitive state |
 | Alcotest screen | Dedicated test combining the above for a snapshot reading |
@@ -91,12 +103,23 @@ Collected on first launch to calibrate the tracking and set defaults.
 ### Languages
 EN, FR, DE, HR, ES
 
+### Style Modes
+Blackout, Cartoon, Chaos
+
+- Chaos is the default
+- Style mode is private to the user
+- Main animations can be turned off separately
+- All modes must stay anti-AI-looking, with no generic rounded app style
+
 ### Privacy Levels
 All toggleable independently. When a feature is off, the app falls back gracefully (e.g. location off → questionnaire fills the gap).
 
 | Setting | Default | Notes |
 |---|---|---|
-| Location sharing | On | If off, triggers onboarding questionnaire |
+| Location sharing | Asked onboarding | If off, triggers onboarding fallback questions |
+| Location precision | Exact | Can be exact, approximate 150m, or off |
+| Default join status | Join me | Toggleable in settings |
+| Drunkness visibility | Category only | Can be category, percentage, both, or hidden |
 | Internet activity tracking | Off | To be developed |
 | Call analysis | Off | Used for alcotest voice feature |
 | Message analysis | Off | Used for alcotest message feature |
@@ -129,4 +152,4 @@ User sets what one drink unit means for them (e.g. 33cl beer = 1, glass of wine 
 
 - **Primary target:** iOS (iPhone)
 - Android and other platforms are out of scope for v
-- No AI-like style (i.e round corners etc...)
+- Visual design must be anti-AI-looking: no generic rounded app style, no glassmorphism, no polished template UI.
