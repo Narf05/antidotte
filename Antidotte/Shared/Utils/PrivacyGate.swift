@@ -1,28 +1,68 @@
 import Foundation
 
 struct PrivacyGate {
-    static func canCollectLocation() -> Bool {
-        // TODO: read privacy_settings.location_sharing_enabled
-        return false
+    private init() {}
+
+    static func canCollectLocation(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.locationSharingEnabled && !user.panicPrivacyActive
     }
 
-    static func canCollectMotion() -> Bool {
-        // TODO: read privacy_settings.motion_tracking_enabled
-        return false
+    static func canShareExactLocation(for user: User?) -> Bool {
+        guard canCollectLocation(for: user), let user else { return false }
+        return user.locationPrecision == VisibilityLevel.exact.rawValue
     }
 
-    static func canCollectPhoneUsage() -> Bool {
-        // TODO: read privacy_settings.phone_usage_tracking_enabled
-        return false
+    static func canCollectBackgroundLocation(for user: User?) -> Bool {
+        guard canCollectLocation(for: user), let user else { return false }
+        return user.shareWhenAppClosed
     }
 
-    static func canCollectVoice() -> Bool {
-        // TODO: read privacy_settings.voice_analysis_enabled
-        return false
+    static func canCollectMotion(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.motionTrackingEnabled && !user.panicPrivacyActive
     }
 
-    static func canSaveDrinkPhotos() -> Bool {
-        // TODO: read privacy_settings.save_drink_photos_enabled
-        return false
+    static func canCollectPhoneUsage(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.phoneUsageTrackingEnabled && !user.panicPrivacyActive
     }
+
+    static func canCollectVoice(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.voiceAnalysisEnabled
+    }
+
+    static func canAnalyzeRefreshmentPhotos(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.photoRefreshmentDetectionEnabled
+    }
+
+    static func canSaveRefreshmentPhotos(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.photoRefreshmentDetectionEnabled && user.saveRefreshmentPhotosEnabled
+    }
+
+    static func canShareScore(for user: User?) -> Bool {
+        guard let user else { return false }
+        return user.scoreSharingEnabled && !user.panicPrivacyActive
+    }
+
+    static func shouldSuggestActiveTest(confidence: Double, threshold: Double = 45) -> Bool {
+        confidence < threshold
+    }
+
+    static func panicPrivacyIsExpired(for user: User?, now: Date = Date()) -> Bool {
+        guard let user, user.panicPrivacyActive, let expiry = user.panicPrivacyExpiresAt else {
+            return false
+        }
+        return expiry <= now
+    }
+
+    // Backward-compatible placeholders for older call sites that do not pass a user.
+    static func canCollectLocation() -> Bool { false }
+    static func canCollectMotion() -> Bool { false }
+    static func canCollectPhoneUsage() -> Bool { false }
+    static func canCollectVoice() -> Bool { false }
+    static func canSaveDrinkPhotos() -> Bool { false }
 }
