@@ -1,34 +1,49 @@
 import type { FastifyPluginAsync } from 'fastify'
+import { requireAuth } from '../middleware/auth'
+import { SessionService } from '../services/SessionService'
 
 const sessionRoutes: FastifyPluginAsync = async (app) => {
-  // GET /sessions
+  app.addHook('preHandler', requireAuth)
+
   app.get('/', async (req, reply) => {
-    // TODO: list user's sessions (history)
+    const userId = (req as any).userId
+    const { limit, offset } = req.query as any
+    const sessions = await SessionService.listSessions(userId, Number(limit) || 20, Number(offset) || 0)
+    return reply.send(sessions)
   })
 
-  // POST /sessions
   app.post('/', async (req, reply) => {
-    // TODO: create or start a new night-out session
+    const userId = (req as any).userId
+    const { title, theme } = req.body as any
+    if (!title) return reply.status(400).send({ error: 'title is required' })
+    const sessionId = await SessionService.startSession(userId, title, theme)
+    return reply.status(201).send({ sessionId })
   })
 
-  // GET /sessions/:sessionId
-  app.get('/:sessionId', async (req, reply) => {
-    // TODO: get session detail
+  app.get<{ Params: { sessionId: string } }>('/:sessionId', async (req, reply) => {
+    const userId = (req as any).userId
+    const session = await SessionService.getSession(req.params.sessionId, userId)
+    if (!session) return reply.status(404).send({ error: 'session not found' })
+    return reply.send(session)
   })
 
-  // PATCH /sessions/:sessionId
-  app.patch('/:sessionId', async (req, reply) => {
-    // TODO: update title, theme, privacy scope
+  app.patch<{ Params: { sessionId: string } }>('/:sessionId', async (req, reply) => {
+    const userId = (req as any).userId
+    const { title, theme, privacyScope } = req.body as any
+    await SessionService.updateSession(req.params.sessionId, userId, { title, theme, privacyScope })
+    return reply.status(204).send()
   })
 
-  // POST /sessions/:sessionId/end
-  app.post('/:sessionId/end', async (req, reply) => {
-    // TODO: end session, start 12-hour responsibility window
+  app.post<{ Params: { sessionId: string } }>('/:sessionId/end', async (req, reply) => {
+    const userId = (req as any).userId
+    await SessionService.endSession(req.params.sessionId, userId)
+    return reply.status(204).send()
   })
 
-  // DELETE /sessions/:sessionId
-  app.delete('/:sessionId', async (req, reply) => {
-    // TODO: soft-delete session, remove from stats
+  app.delete<{ Params: { sessionId: string } }>('/:sessionId', async (req, reply) => {
+    const userId = (req as any).userId
+    await SessionService.deleteSession(req.params.sessionId, userId)
+    return reply.status(204).send()
   })
 }
 

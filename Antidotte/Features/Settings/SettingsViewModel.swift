@@ -14,8 +14,40 @@ final class SettingsViewModel: ObservableObject {
     @Published var language: String = "en"
     @Published var notificationsEnabled: Bool = true
 
+    func load() {
+        Task {
+            let profile = try? await APIClient.shared.getProfile()
+            await MainActor.run {
+                styleMode = profile?["style_mode"]?.value as? String ?? "chaos"
+                drunknessVisibility = profile?["drunkness_visibility"]?.value as? String ?? "category"
+                locationEnabled = profile?["location_sharing_enabled"]?.value as? Bool ?? false
+                motionEnabled = profile?["motion_tracking_enabled"]?.value as? Bool ?? false
+                phoneUsageEnabled = profile?["phone_usage_tracking_enabled"]?.value as? Bool ?? false
+                voiceAnalysisEnabled = profile?["voice_analysis_enabled"]?.value as? Bool ?? false
+                notificationsEnabled = profile?["notifications_enabled"]?.value as? Bool ?? true
+                panicPrivacyActive = profile?["panic_privacy_active"]?.value as? Bool ?? false
+            }
+        }
+    }
+
     func togglePanicPrivacy() {
         panicPrivacyActive.toggle()
-        // TODO: PATCH /users/settings, push hidden state to all friends via WS
+        Task {
+            try? await APIClient.shared.updateSettings(["panicPrivacyActive": AnyEncodable(panicPrivacyActive)])
+        }
+    }
+
+    func save() {
+        Task {
+            try? await APIClient.shared.updateSettings([
+                "locationSharingEnabled": AnyEncodable(locationEnabled),
+                "motionTrackingEnabled": AnyEncodable(motionEnabled),
+                "phoneUsageTrackingEnabled": AnyEncodable(phoneUsageEnabled),
+                "voiceAnalysisEnabled": AnyEncodable(voiceAnalysisEnabled),
+                "drunknessVisibility": AnyEncodable(drunknessVisibility),
+                "styleMode": AnyEncodable(styleMode),
+                "notificationsEnabled": AnyEncodable(notificationsEnabled),
+            ])
+        }
     }
 }

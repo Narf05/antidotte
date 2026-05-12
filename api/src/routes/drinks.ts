@@ -1,29 +1,44 @@
 import type { FastifyPluginAsync } from 'fastify'
+import { requireAuth } from '../middleware/auth'
+import { DrinkService } from '../services/DrinkService'
 
 const drinkRoutes: FastifyPluginAsync = async (app) => {
-  // GET /drinks
+  app.addHook('preHandler', requireAuth)
+
   app.get('/', async (req, reply) => {
-    // TODO: list drink logs for current user (paginated)
+    const userId = (req as any).userId
+    const { sessionId, limit, offset } = req.query as any
+    const logs = await DrinkService.listDrinks(userId, sessionId, Number(limit) || 50, Number(offset) || 0)
+    return reply.send(logs)
   })
 
-  // POST /drinks
   app.post('/', async (req, reply) => {
-    // TODO: log a drink (+1 or manual), trigger score recompute
+    const userId = (req as any).userId
+    const body = req.body as any
+    if (!body.drinkType) return reply.status(400).send({ error: 'drinkType is required' })
+    if (!body.timezone) return reply.status(400).send({ error: 'timezone is required' })
+
+    const logId = await DrinkService.logDrink(userId, body)
+    return reply.status(201).send({ logId })
   })
 
-  // PATCH /drinks/:logId
-  app.patch('/:logId', async (req, reply) => {
-    // TODO: edit drink log
+  app.patch<{ Params: { logId: string } }>('/:logId', async (req, reply) => {
+    const userId = (req as any).userId
+    await DrinkService.updateDrink(req.params.logId, userId, req.body as any)
+    return reply.status(204).send()
   })
 
-  // DELETE /drinks/:logId
-  app.delete('/:logId', async (req, reply) => {
-    // TODO: soft-delete drink log, recompute score
+  app.delete<{ Params: { logId: string } }>('/:logId', async (req, reply) => {
+    const userId = (req as any).userId
+    await DrinkService.deleteDrink(req.params.logId, userId)
+    return reply.status(204).send()
   })
 
-  // POST /drinks/analyze-photo
   app.post('/analyze-photo', async (req, reply) => {
-    // TODO: receive photo, run detection, return detected values without saving drink yet
+    const userId = (req as any).userId
+    // In a real implementation, read multipart photo buffer here
+    const result = await DrinkService.analyzePhoto(userId, Buffer.alloc(0))
+    return reply.send(result)
   })
 }
 

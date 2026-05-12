@@ -1,34 +1,70 @@
 import type { FastifyPluginAsync } from 'fastify'
+import { requireAuth } from '../middleware/auth'
+import { FriendService } from '../services/FriendService'
+import { NotificationService } from '../services/NotificationService'
 
 const friendRoutes: FastifyPluginAsync = async (app) => {
-  // GET /friends
+  app.addHook('preHandler', requireAuth)
+
   app.get('/', async (req, reply) => {
-    // TODO: list accepted friends
+    const userId = (req as any).userId
+    const friends = await FriendService.listFriends(userId)
+    return reply.send(friends)
   })
 
-  // POST /friends/request
   app.post('/request', async (req, reply) => {
-    // TODO: send friend request (by userId, invite code, or contact match)
+    const userId = (req as any).userId
+    const { recipientId, inviteCode, source } = req.body as any
+
+    let targetId = recipientId
+
+    if (inviteCode) {
+      const ownerId = await FriendService.redeemInviteCode(inviteCode, userId)
+      if (!ownerId) return reply.status(404).send({ error: 'invalid or expired invite code' })
+      targetId = ownerId
+    }
+
+    if (!targetId) return reply.status(400).send({ error: 'recipientId or inviteCode is required' })
+    if (targetId === userId) return reply.status(400).send({ error: 'cannot send request to yourself' })
+
+    await FriendService.sendRequest(userId, targetId, source ?? 'search')
+    await NotificationService.send(targetId, 'friend_request', undefined, userId)
+
+    return reply.status(201).send()
   })
 
-  // PATCH /friends/request/:requestId
-  app.patch('/request/:requestId', async (req, reply) => {
-    // TODO: accept or decline a friend request
+  app.patch<{ Params: { requestId: string } }>('/request/:requestId', async (req, reply) => {
+    const userId = (req as any).userId
+    const { requestId } = req.params
+    const { action } = req.body as any
+
+    if (action === 'accept') {
+      await FriendService.acceptRequest(requestId, userId)
+      return reply.status(204).send()
+    }
+    if (action === 'decline') {
+      await FriendService.declineRequest(requestId, userId)
+      return reply.status(204).send()
+    }
+    return reply.status(400).send({ error: 'action must be accept or decline' })
   })
 
-  // DELETE /friends/:friendId
-  app.delete('/:friendId', async (req, reply) => {
-    // TODO: remove friend, revoke their access immediately
+  app.delete<{ Params: { friendId: string } }>('/:friendId', async (req, reply) => {
+    const userId = (req as any).userId
+    await FriendService.removeFriend(userId, req.params.friendId)
+    return reply.status(204).send()
   })
 
-  // POST /friends/block/:userId
-  app.post('/block/:userId', async (req, reply) => {
-    // TODO: block user, hide both from each other
+  app.post<{ Params: { userId: string } }>('/block/:userId', async (req, reply) => {
+    const userId = (req as any).userId
+    await FriendService.blockUser(userId, req.params.userId)
+    return reply.status(204).send()
   })
 
-  // POST /friends/invite-code
   app.post('/invite-code', async (req, reply) => {
-    // TODO: generate invite code, store hash, return code
+    const userId = (req as any).userId
+    const code = await FriendService.generateInviteCode(userId)
+    return reply.send({ code })
   })
 }
 
